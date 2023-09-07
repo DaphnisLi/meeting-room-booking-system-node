@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Inject } from '@nestjs/common'
+import { Body, Controller, Post, Inject, Logger } from '@nestjs/common'
 import { UserService } from './user.service'
 import { RegisterUserDto } from './dto/registerUser.dto'
 import { RegisterCaptcha } from './dto/registerCaptcha.dto'
@@ -14,6 +14,9 @@ export class UserController {
   @Inject(RedisService)
   private redisService: RedisService
 
+  private logger = new Logger() // 日志
+
+
   @Post('register')
   async register(@Body() registerUser: RegisterUserDto) {
     return await this.userService.register(registerUser)
@@ -27,15 +30,21 @@ export class UserController {
     const ttl = 5 * 60
     await this.redisService.set(emailAddress, code, ttl)
 
-    await this.emailService.sendMail({
-      to: emailAddress,
-      subject: '注册验证码',
-      html: `
-          <p>你的注册验证码是 ${code}</p>
-          <p>有效期 ${ttl / 60} min</p>
-        `
-    })
-    return '发送成功'
+    try {
+      await this.emailService.sendMail({
+        to: emailAddress,
+        subject: '注册验证码',
+        html: `
+            <p>你的注册验证码是 ${code}</p>
+            <p>有效期 ${ttl / 60} min</p>
+          `
+      })
+      return '发送成功'
+    } catch (e) {
+      this.logger.error(e, UserService)
+      return '发送失败'
+    }
   }
+  
 }
 

@@ -2,36 +2,43 @@ import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
-import { mysqlConfig } from './common/config'
 import { User } from './user/entities/user'
 import { Permission } from './user/entities/permission'
 import { Role } from './user/entities/role'
 import { UserModule } from './user/user.module'
 import { RedisModule } from './redis/redis.module'
 import { EmailModule } from './email/email.module'
-
-
-const { database, username, password, port, localhost } = mysqlConfig
+import { ConfigModule } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: "mysql",
-      host: localhost,
-      port,
-      username,
-      password,
-      database,
-      synchronize: true,
-      logging: true,
-      poolSize: 10,
-      connectorPackage: 'mysql2',
-      extra: {
-        authPlugin: 'sha256_password',
+    TypeOrmModule.forRootAsync({
+      useFactory(configService: ConfigService) {
+        return {
+          type: "mysql",
+          host: configService.get('MYSQL_CONFIG_HOST'),
+          port: configService.get('MYSQL_CONFIG_PORT'),
+          username: configService.get('MYSQL_CONFIG_USERNAME'),
+          password: configService.get('MYSQL_CONFIG_PASSWORD'),
+          database: configService.get('MYSQL_CONFIG_DATABASE'),
+          synchronize: true,
+          logging: true,
+          poolSize: 10,
+          connectorPackage: 'mysql2',
+          extra: {
+            authPlugin: 'sha256_password',
+          },
+          entities: [Permission, Role, User],
+        }
       },
-      entities: [Permission, Role, User],
+      inject: [ConfigService]
     }),
     UserModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: 'src/.env'
+    }),
     RedisModule,
     EmailModule,
   ],

@@ -5,13 +5,21 @@ import { Repository } from 'typeorm'
 import { RegisterUserDto } from './dto/registerUser.dto'
 import { User } from './entities/user'
 import { RedisService } from 'src/redis/redis.service'
+import { Permission } from './entities/permission'
+import { Role } from './entities/role'
 
 @Injectable()
 export class UserService {
-  private logger = new Logger()
+  private logger = new Logger() // 日志
 
   @InjectRepository(User)
   private userRepository: Repository<User>
+
+  @InjectRepository(Permission)
+  private permissionRepository: Repository<Permission>
+
+  @InjectRepository(Role)
+  private roleRepository: Repository<Role>
 
   @Inject(RedisService)
   private redisService: RedisService
@@ -49,5 +57,4 @@ export class UserService {
       return '注册失败'
     }
   }
-
 }

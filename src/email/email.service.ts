@@ -1,8 +1,5 @@
-import { Injectable } from '@nestjs/common'
-import { createTransport, Transporter } from 'nodemailer'
-import { emailConfig } from '../common/config'
-
-const { host, port, user, pass } = emailConfig
+import {Injectable, Inject} from '@nestjs/common'
+import { Transporter } from 'nodemailer'
 
 interface SendMailParams {
   to: string // 目的邮箱地址
@@ -13,26 +10,18 @@ interface SendMailParams {
 @Injectable()
 export class EmailService {
 
-  transporter: Transporter
+  @Inject('EMAIL_CLIENT')
+  private emailClient: Transporter
 
-  constructor() {
-    this.transporter = createTransport({
-      host,
-      port,
-      secure: false,
-      auth: {
-        user,
-        pass,
-      },
-    })
-  }
+  @Inject('EMAIL_USER')
+  private emailUser: string
 
   async sendMail(params: SendMailParams) {
     const { to, subject, html } = params
-    await this.transporter.sendMail({
+    await this.emailClient.sendMail({
       from: {
         name: '会议室预定系统',
-        address: user,
+        address: this.emailUser,
       },
       to,
       subject,
