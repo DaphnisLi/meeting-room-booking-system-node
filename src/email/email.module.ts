@@ -24,13 +24,6 @@ import { createTransport } from 'nodemailer'
         },
         inject: [ConfigService]
       },
-      {
-        provide: 'EMAIL_USER',
-        async useFactory(configService: ConfigService) {
-          return configService.get('EMAIL_CONFIG_USER')
-        },
-        inject: [ConfigService]
-      }
     ],
   exports: [EmailService]
 })

@@ -10,9 +10,22 @@ import { RedisModule } from './redis/redis.module'
 import { EmailModule } from './email/email.module'
 import { ConfigModule } from '@nestjs/config'
 import { ConfigService } from '@nestjs/config'
+import { JwtModule } from '@nestjs/jwt'
 
 @Module({
   imports: [
+    JwtModule.registerAsync({
+      global: true,
+      useFactory(configService: ConfigService) {
+        return {
+          secret: configService.get('JWT_SECRET'),
+          signOptions: {
+            expiresIn: '30m' // 默认 30 分钟
+          }
+        }
+      },
+      inject: [ConfigService]
+    }),
     TypeOrmModule.forRootAsync({
       useFactory(configService: ConfigService) {
         return {
