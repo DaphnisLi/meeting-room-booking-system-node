@@ -10,3 +10,7 @@ module 处理模块
 
 # 注意
 - src 里的文件才会被复制到 dist
+
+
+# 基础
+- Injectable 提供者: 提供依赖
