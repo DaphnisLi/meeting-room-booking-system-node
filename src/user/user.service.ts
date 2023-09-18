@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable, Logger, Inject, } from '@nestjs/common'
 import { InjectRepository, } from '@nestjs/typeorm'
-import { md5 } from 'src/common/utils'
+import { md5 } from 'src/utils'
 import { Like, Repository } from 'typeorm'
 import { RegisterUserDto } from './dto/registerUser.dto'
 import { User } from './entities/user'
