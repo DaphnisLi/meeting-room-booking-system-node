@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Inject, Logger, Get, Query, UnauthorizedException, DefaultValuePipe } from '@nestjs/common'
+import {Body, Controller, Post, Inject, Logger, Get, Query, UnauthorizedException, DefaultValuePipe, HttpException, HttpStatus} from '@nestjs/common'
 import { UserService } from './user.service'
 import { RegisterUserDto } from './dto/registerUser.dto'
 import { RegisterCaptcha } from './dto/registerCaptcha.dto'
@@ -237,6 +237,7 @@ export class UserController {
     @Query('nickName') nickName: string,
     @Query('email') email: string
   ) {
+    throw new HttpException('用户已存在', HttpStatus.BAD_REQUEST)
     return await this.userService.findUsers(username, nickName, email, pageNo, pageSize)
   }
 

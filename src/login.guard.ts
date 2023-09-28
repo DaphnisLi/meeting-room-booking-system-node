@@ -18,6 +18,7 @@ declare module 'express' {
   }
 }
 
+// 登陆守卫
 @Injectable()
 export class LoginGuard implements CanActivate {
 
@@ -32,23 +33,24 @@ export class LoginGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request: Request = context.switchToHttp().getRequest()
 
+    // requireLogin 为 SetMetadata 传过来的参数
     const requireLogin = this.reflector.getAllAndOverride('require-login', [
-      context.getClass(),
-      context.getHandler()
+      context.getClass(), // 获取对应的 class
+      context.getHandler() // 执行对应的方法
     ])
 
-
-    if(!requireLogin) {
+    // 如果没有使用 RequireLogin, 则 requireLogin 为 undefined
+    if (!requireLogin) {
       return true
     }
 
     const authorization = request.headers.authorization
 
-    if(!authorization) {
+    if (!authorization) {
       throw new UnauthorizedException('用户未登录')
     }
 
-    try{
+    try {
       const token = authorization.split(' ')[1]
       const data = this.jwtService.verify<JwtUserData>(token)
 
@@ -59,7 +61,7 @@ export class LoginGuard implements CanActivate {
         permissions: data.permissions
       }
       return true
-    } catch(e) {
+    } catch (e) {
       throw new UnauthorizedException('token 失效，请重新登录')
     }
   }

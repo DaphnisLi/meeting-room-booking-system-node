@@ -4,18 +4,18 @@ import { ValidationPipe } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { FormatResponseInterceptor } from './format-response.interceptor'
 import { InvokeRecordInterceptor } from './invoke-record.interceptor'
-import { UnloginFilter } from './unlogin.filter'
 import { CustomExceptionFilter } from './custom-exception.filter'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
-  app.useGlobalPipes(new ValidationPipe())
+  const configService = app.get(ConfigService)
+
+  app.useGlobalPipes(new ValidationPipe()) // 全局注册校验
   app.useGlobalInterceptors(new FormatResponseInterceptor())
   app.useGlobalInterceptors(new InvokeRecordInterceptor())
-  app.useGlobalFilters(new UnloginFilter())
   app.useGlobalFilters(new CustomExceptionFilter())
 
-  const configService = app.get(ConfigService)
   await app.listen(configService.get('NEST_SERVICE_PORT'))
 }
+
 bootstrap()

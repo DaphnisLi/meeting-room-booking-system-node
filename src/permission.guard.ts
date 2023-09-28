@@ -2,6 +2,7 @@ import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedExceptio
 import { Reflector } from '@nestjs/core'
 import { Request } from 'express'
 
+// 权限守卫
 @Injectable()
 export class PermissionGuard implements CanActivate {
 
